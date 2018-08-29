@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2D Platformer Base Game", "Assembly-CSharp.csproj", "{97AEC2E4-80DF-62D3-A0BD-28097167D549}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "2D Platformer Base Game", "Assembly-CSharp-Editor.csproj", "{EC699715-2935-AC9C-0A25-12F3A9BB449E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{97AEC2E4-80DF-62D3-A0BD-28097167D549}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{97AEC2E4-80DF-62D3-A0BD-28097167D549}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{97AEC2E4-80DF-62D3-A0BD-28097167D549}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{97AEC2E4-80DF-62D3-A0BD-28097167D549}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC699715-2935-AC9C-0A25-12F3A9BB449E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC699715-2935-AC9C-0A25-12F3A9BB449E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC699715-2935-AC9C-0A25-12F3A9BB449E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC699715-2935-AC9C-0A25-12F3A9BB449E}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
