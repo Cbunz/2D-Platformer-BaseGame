@@ -61,46 +61,71 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\AI\AttackingAI.cs" />
-    <Compile Include="Assets\Scripts\AI\CubeAI.cs" />
-    <Compile Include="Assets\Scripts\AI\FlyingEnemyScript.cs" />
-    <Compile Include="Assets\Scripts\AI\MiddleLevelAI.cs" />
-    <Compile Include="Assets\Scripts\AI\player_Enter.cs" />
-    <Compile Include="Assets\Scripts\Checkpoint.cs" />
-    <Compile Include="Assets\Scripts\Damageable.cs" />
-    <Compile Include="Assets\Scripts\Damager.cs" />
-    <Compile Include="Assets\Scripts\LayerMaskExtensions.cs" />
-    <Compile Include="Assets\Scripts\MovingPlatform.cs" />
-    <Compile Include="Assets\Scripts\ParameterSetterDrawer.cs" />
-    <Compile Include="Assets\Scripts\PhysicsHelper.cs" />
-    <Compile Include="Assets\Scripts\Player\CharacterController2D.cs" />
-    <Compile Include="Assets\Scripts\Player\InputComponent.cs" />
-    <Compile Include="Assets\Scripts\Player\InventoryController.cs" />
-    <Compile Include="Assets\Scripts\Player\InventoryItem.cs" />
-    <Compile Include="Assets\Scripts\Player\PlayerCharacter.cs" />
-    <Compile Include="Assets\Scripts\Player\PlayerInput.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\CameraFollow.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\CharacterStateSetter.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\GameObjectTeleporter.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\IDataPersister.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\PersistentDataManager.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\SavedData.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\SceneController.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\SceneControllerWrapper.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\SceneNameAttribute.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\SceneTransitionDestination.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\ScreenFader.cs" />
-    <Compile Include="Assets\Scripts\SceneManagement\TransitionPoint.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\AirborneSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\AirMeleeAttackSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\DeathLandingSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\DeathSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\MeleeAttackSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\MovementSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\RespawnSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\SceneLinkedSMB.cs" />
-    <Compile Include="Assets\Scripts\StateMachineBehavior\TakeDamageSMB.cs" />
-    <Compile Include="Assets\Scripts\TransitionStartEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\AttackingAI.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\CubeAI.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\FlyingEnemyScript.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\MiddleLevelAI.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\player_Enter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Audio\AudioSurface.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Audio\BackgroundMusicPlayer.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Audio\RandomAudioPlayer.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\BoulderTrap.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\Bullet.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\BulletPool.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\CharacterController2D.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\Damageable.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\Damager.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\EnemyBehaviour.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\InputComponent.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\PlayerCharacter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\PlayerInput.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\AirborneRangedSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\AirborneSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\AirMeleeAttackSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\DeathLandingSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\DeathSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\MeleeAttackSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\MovementRangedSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\MovementSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\RespawnSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\SceneLinkedSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\TakeDamageSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\WallSlideSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\Checkpoint.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InteractOnButton2D.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InteractOnCollision2D.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InteractOnTrigger2D.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InventoryController.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InventoryItem.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\LayerMaskExtensions.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\ObjectPool.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\EnemySpawner.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\HealthPickup.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\HubDoor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Platforms\MovingPlatform.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Platforms\PlatformCatcher.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Pushables\Pushable.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\WeaponPickup.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\CameraFollow.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\CharacterStateSetter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\GameObjectTeleporter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\IDataPersister.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\PersistentDataManager.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\SavedData.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\SceneController.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\SceneControllerWrapper.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\SceneNameAttribute.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\SceneTransitionDestination.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\ScreenFader.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\TransitionPoint.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Timeline\DirectorTrigger.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\Helpers.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\PhysicsHelper.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\SetMaterialRenderQueue.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\VisibleBubbleUp.cs" />
+    <Reference Include="Cinemachine">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Cinemachine.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
@@ -109,6 +134,9 @@
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>

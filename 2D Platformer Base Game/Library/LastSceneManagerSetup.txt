@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Scenes/TestLevel.unity
+- path: Assets/2DPlatformerBaseGame/Scenes/TestLevel.unity
   isLoaded: 1
   isActive: 1

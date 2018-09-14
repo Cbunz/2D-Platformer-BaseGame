@@ -61,12 +61,20 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\Editor\CharacterStateSetterEditor.cs" />
-    <Compile Include="Assets\Scripts\Editor\DamageableEditor.cs" />
-    <Compile Include="Assets\Scripts\Editor\DamagerEditor.cs" />
-    <Compile Include="Assets\Scripts\Editor\DataPersisterEditor.cs" />
-    <Compile Include="Assets\Scripts\Editor\PlayerCharacterEditor.cs" />
-    <Compile Include="Assets\Scripts\Editor\PlayerInputEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\Editor\CharacterStateSetterEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\Editor\DamageableEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\Editor\DamagerEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\Editor\PlayerCharacterEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\Editor\PlayerInputEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Editor\MovingPlatformEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Editor\MovingPlatformPreview.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\Editor\DataPersisterEditor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\Editor\ParameterSetterDrawer.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\Editor\SceneNameDrawer.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\Editor\TransitionStartEditor.cs" />
+    <Reference Include="Cinemachine">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Cinemachine.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
     </Reference>
@@ -75,6 +83,9 @@
     </Reference>
     <Reference Include="Unity.PackageManagerUI.Editor">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="com.unity.cinemachine.editor">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>

@@ -21,8 +21,8 @@ TagManager:
   - Destructable
   - IgnorePlayer
   - Platform
-  - 
-  - 
+  - Bullet
+  - Wall
   - 
   - 
   - 
