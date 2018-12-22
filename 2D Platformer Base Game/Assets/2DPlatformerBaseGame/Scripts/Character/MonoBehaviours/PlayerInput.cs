@@ -21,6 +21,8 @@ public class PlayerInput : InputComponent, IDataPersister
     public InputButton Jump = new InputButton(KeyCode.Space, XboxControllerButtons.A);
     public InputAxis Horizontal = new InputAxis(KeyCode.D, KeyCode.A, XboxControllerAxes.LeftstickHorizontal);
     public InputAxis Vertical = new InputAxis(KeyCode.W, KeyCode.S, XboxControllerAxes.LeftstickVertical);
+    public InputButton Boost = new InputButton(KeyCode.Mouse0, XboxControllerButtons.RightBumper);
+
     // [HideInInspector]
     public DataSettings dataSettings;
 

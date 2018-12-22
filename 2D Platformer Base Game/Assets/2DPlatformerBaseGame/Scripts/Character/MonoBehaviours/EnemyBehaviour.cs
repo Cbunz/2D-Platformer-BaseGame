@@ -22,7 +22,15 @@ public class EnemyBehaviour : MonoBehaviour {
     public float speed;
     public float gravity = 10.0f;
 
-    // [Header("References")]
+    [Header("References")]
+    public Bullet projectilePrefab;
+
+    [Header("Patrol Settings")]
+    public LayerMask obstacles;
+    public float obstacleViewDistance = 0.3f;
+    public bool usePatrolBorders;
+    public Vector3 patrolLeft = Vector3.zero;
+    public Vector3 patrolRight = Vector3.zero;
 
     [Header("Scanning Settings")]
     [Range(0.0f, 360.0f)]
@@ -46,14 +54,21 @@ public class EnemyBehaviour : MonoBehaviour {
     public float shootForce = 100.0f;
     public float fireRate = 2.0f;
 
-    // [Header("Audio")]
-
-    [Header("Misc")]
+    [Header("Hurt Data")]
+    public Vector2 knockback;
     public float flickeringDuration;
+
+    [Header("Audio")]
+    public RandomAudioPlayer shootingAudio;
+    public RandomAudioPlayer meleeAttackAudio;
+    public RandomAudioPlayer hurtAudio;
+    public RandomAudioPlayer dieAudio;
+    public RandomAudioPlayer movementAudio;
 
     protected SpriteRenderer spriteRenderer;
     protected CharacterController2D characterController2D;
-    protected Collider2D _collider;
+    protected new Rigidbody2D rigidbody2D;
+    protected new Collider2D collider;
     protected Animator animator;
 
     protected Vector3 targetShootPosition;
@@ -64,6 +79,8 @@ public class EnemyBehaviour : MonoBehaviour {
     protected Vector2 spriteForward;
     protected Bounds localBounds;
     protected Vector3 localDamagerPosition;
+    [HideInInspector]
+    public Vector3 startPosition;
 
     protected RaycastHit2D[] raycastHitCache = new RaycastHit2D[8];
     protected ContactFilter2D filter;
@@ -71,8 +88,9 @@ public class EnemyBehaviour : MonoBehaviour {
     protected Coroutine flickeringCoroutine = null;
     protected Color originalColor;
 
-    // protected BulletPool bulletPool;
+    protected BulletPool bulletPool;
 
+    protected bool canTurn = true;
     protected bool dead = false;
 
     protected readonly int hashSpottedParameter = Animator.StringToHash("Spotted");
@@ -86,33 +104,31 @@ public class EnemyBehaviour : MonoBehaviour {
     private void Awake()
     {
         characterController2D = GetComponent<CharacterController2D>();
-        _collider = GetComponent<Collider2D>();
+        rigidbody2D = GetComponent<Rigidbody2D>();
+        collider = GetComponent<Collider2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         originalColor = spriteRenderer.color;
 
+        if (projectilePrefab != null)
+            bulletPool = BulletPool.GetObjectPool(projectilePrefab.gameObject, 8);
+
         spriteForward = spriteFaceLeft ? Vector2.left : Vector2.right;
         if (spriteRenderer.flipX)
-        {
             spriteForward = -spriteForward;
-        }
 
         if (meleeDamager != null)
-        {
             EndAttack();
-        }
     }
 
     private void OnEnable()
     {
         if (meleeDamager != null)
-        {
             EndAttack();
-        }
 
         dead = false;
-        _collider.enabled = true;
+        collider.enabled = true;
     }
 
     private void Start()
@@ -127,24 +143,22 @@ public class EnemyBehaviour : MonoBehaviour {
         }
 
         filter = new ContactFilter2D();
-        filter.layerMask = characterController2D.groundedLayerMask;
+        filter.layerMask = obstacles;
         filter.useLayerMask = true;
         filter.useTriggers = false;
 
         if (meleeDamager)
-        {
             localDamagerPosition = meleeDamager.transform.localPosition;
-        }
+
+        startPosition = transform.position;
     }
 
     void FixedUpdate()
     {
         if (dead)
-        {
             return;
-        }
 
-        moveVector.y = Mathf.Max(moveVector.y - gravity * Time.deltaTime, -gravity);
+        //moveVector.y = Mathf.Max(moveVector.y - gravity * Time.deltaTime, -gravity);
 
         characterController2D.Move(MoveVector * Time.deltaTime);
 
@@ -154,18 +168,26 @@ public class EnemyBehaviour : MonoBehaviour {
 
         animator.SetBool(hashGroundedParameter, characterController2D.Grounded);
     }
-
+    
     void UpdateTimers()
     {
         if (timeSinceLastTargetView > 0.0f)
-        {
             timeSinceLastTargetView -= Time.deltaTime;
-        }
 
         if (fireTimer > 0.0f)
-        {
             fireTimer -= Time.deltaTime;
-        }
+    }
+
+    public void AirVerticalMovement()
+    {
+        if (Mathf.Approximately(moveVector.y, 0f) || characterController2D.OnCeiling && moveVector.y > 0f)
+            moveVector.y = 0f;
+        moveVector.y -= gravity * Time.deltaTime;
+    }
+
+    public void AirHorizontalMovement()
+    {
+        moveVector.x = 0;
     }
 
     public void SetHorizontalSpeed(float horizontalSpeed)
@@ -173,9 +195,32 @@ public class EnemyBehaviour : MonoBehaviour {
         moveVector.x = horizontalSpeed * spriteForward.x;
     }
 
+    public void NoMovement()
+    {
+        moveVector = Vector2.zero;
+        rigidbody2D.velocity = Vector2.zero;
+    }
+
+    public void TurnAround(float speed)
+    {
+        if (canTurn)
+        {
+            canTurn = false;
+            StartCoroutine(Turn(speed));
+        }
+    }
+
+    IEnumerator Turn(float speed)
+    {
+        SetHorizontalSpeed(-speed);
+        UpdateFacing();
+        yield return new WaitForSeconds(.1f);
+        canTurn = true;
+    }
+
     public bool CheckForObstacle(float forwardDistance)
     {
-        if (Physics2D.CircleCast(_collider.bounds.center, _collider.bounds.extents.y - 0.2f, spriteForward, forwardDistance, filter.layerMask.value))
+        if (Physics2D.CircleCast(collider.bounds.center, collider.bounds.extents.y - 0.2f, spriteForward, obstacleViewDistance, filter.layerMask.value))
         {
             return true;
         }
@@ -189,6 +234,25 @@ public class EnemyBehaviour : MonoBehaviour {
         }
 
         return false;
+    }
+
+    public bool CheckWithinPatrolBorders()
+    {
+        if (rigidbody2D.position.x <= patrolLeft.x + startPosition.x || rigidbody2D.position.x >= patrolRight.x + startPosition.x)
+        {
+            return false;
+        }
+        else
+            return true;
+    }
+
+    public bool CheckGrounded()
+    {
+        bool grounded = characterController2D.Grounded;
+
+        animator.SetBool(hashGroundedParameter, grounded);
+
+        return grounded;
     }
 
     public void SetFacingData(int facing)
@@ -250,6 +314,7 @@ public class EnemyBehaviour : MonoBehaviour {
 
         target = PlayerCharacter.PlayerInstance.transform;
         timeSinceLastTargetView = timeBeforeTargetLost;
+
         animator.SetTrigger(hashSpottedParameter);
     }
 
@@ -281,22 +346,16 @@ public class EnemyBehaviour : MonoBehaviour {
         {
             Vector3 testForward = Quaternion.Euler(0, 0, spriteFaceLeft ? -viewDirection : viewDirection) * spriteForward;
             if (spriteRenderer.flipX)
-            {
                 testForward.x = -testForward.x;
-            }
 
             float angle = Vector3.Angle(testForward, toTarget);
 
             if (angle <= viewFOV * 0.5f)
-            {
                 timeSinceLastTargetView = timeBeforeTargetLost;
-            }
         }
 
         if (timeSinceLastTargetView <= 0.0f)
-        {
             ForgetTarget();
-        }
     }
 
     public void ForgetTarget()
@@ -308,9 +367,7 @@ public class EnemyBehaviour : MonoBehaviour {
     public void RememberTargetPos()
     {
         if (target == null)
-        {
             return;
-        }
 
         targetShootPosition = target.transform.position;
     }
@@ -325,27 +382,22 @@ public class EnemyBehaviour : MonoBehaviour {
         if ((target.transform.position - transform.position).sqrMagnitude < (meleeRange * meleeRange))
         {
             animator.SetTrigger(hashMeleeAttackParameter);
+            meleeAttackAudio.PlayRandomSound();
         }
     }
 
     public void StartAttack()
     {
         if (spriteRenderer.flipX)
-        {
             meleeDamager.transform.localPosition = Vector3.Scale(localDamagerPosition, new Vector3(-1, 1, 1));
-        }
         else
-        {
             meleeDamager.transform.localPosition = localDamagerPosition;
-        }
 
         meleeDamager.EnableDamage();
         meleeDamager.gameObject.SetActive(true);
 
         if (attackDash)
-        {
             moveVector = new Vector2(spriteForward.x * attackForce.x, attackForce.y);
-        }
     }
 
     public void EndAttack()
@@ -370,6 +422,7 @@ public class EnemyBehaviour : MonoBehaviour {
         }
 
         animator.SetTrigger(hashShootingParameter);
+        shootingAudio.PlayRandomSound();
 
         fireTimer = fireRate;
     }
@@ -383,13 +436,13 @@ public class EnemyBehaviour : MonoBehaviour {
         Vector2 shootPosition = shootingOrigin.transform.localPosition;
 
         if ((spriteFaceLeft && spriteForward.x > 0) || (!spriteFaceLeft && spriteForward.x > 0))
-        {
             shootPosition.x *= -1;
-        }
 
-        // BulletObject obj = bulletPool.Pop(shootingOrigin.TransformPoint(shootPosition));
+        BulletObject obj = bulletPool.Pop(shootingOrigin.TransformPoint(shootPosition));
 
-        // obj.rigidbody2D.velocity = (GetProjectileVelocity(targetShootPosition, shootingOrigin.transform.position));
+        shootingAudio.PlayRandomSound();
+
+        obj.rigidbody2D.velocity = (GetProjectileVelocity(targetShootPosition, shootingOrigin.transform.position));
     }
 
     private Vector3 GetProjectileVelocity(Vector3 target, Vector3 origin)
@@ -446,36 +499,45 @@ public class EnemyBehaviour : MonoBehaviour {
         return velocity;
     }
 
+    public void Death()
+    {
+        Destroy(this.gameObject);
+    }
+
     public void Die(Damager damager, Damageable damageable)
     {
-        Vector2 throwVector = new Vector2(0, 2.0f);
+        Vector2 throwVector = new Vector2(0, 5.0f);
         Vector2 damagerToThis = damager.transform.position - transform.position;
 
-        throwVector.x = Mathf.Sign(damagerToThis.x) * -4.0f;
+        throwVector.x = Mathf.Sign(damagerToThis.x) * 4.0f;
         SetMoveVector(throwVector);
 
         animator.SetTrigger(hashDeathParameter);
 
-        dead = true;
-        _collider.enabled = false;
+        if (dieAudio != null)
+            dieAudio.PlayRandomSound();
 
-        // CameraShaker.Shake(0.15f, 0.3f);
+        dead = true;
+        collider.enabled = false;
+
+        CameraShaker.Shake(0.15f, 0.3f);
     }
 
     public void Hit(Damager damager, Damageable damageable)
     {
         if (damageable.CurrentHealth <= 0)
-        {
             return;
-        }
 
         animator.SetTrigger(hashHitParameter);
 
-        Vector2 throwVector = new Vector2(0, 3.0f);
-        Vector2 damagerToThis = damager.transform.position - transform.position;
+        //Vector2 throwVector = new Vector2(0, 5.0f);
+        //Vector2 damagerToThis = damager.transform.position - transform.position;
 
-        throwVector.x = Mathf.Sign(damagerToThis.x) * -2.0f;
-        moveVector = throwVector;
+        //throwVector.x = Mathf.Sign(damagerToThis.x) * 2.0f;
+        //moveVector = throwVector;
+
+        moveVector = Vector2.zero;
+        moveVector = new Vector2(0, knockback.y);
 
         if (flickeringCoroutine != null)
         {
@@ -484,7 +546,7 @@ public class EnemyBehaviour : MonoBehaviour {
         }
 
         flickeringCoroutine = StartCoroutine(Flicker(damageable));
-        // CameraShaker.Shake(0.15f, 0.3f);
+        CameraShaker.Shake(0.15f, 0.3f);
     }
 
     protected IEnumerator Flicker(Damageable damageable)
@@ -517,13 +579,14 @@ public class EnemyBehaviour : MonoBehaviour {
     public void DisableDamage()
     {
         if (meleeDamager != null)
-        {
             meleeDamager.DisableDamage();
-        }
         if (contactDamager != null)
-        {
             contactDamager.DisableDamage();
-        }
+    }
+
+    public void PlayMovementAudio()
+    {
+        movementAudio.PlayRandomSound();
     }
 
 #if UNITY_EDITOR
@@ -533,9 +596,7 @@ public class EnemyBehaviour : MonoBehaviour {
         forward = Quaternion.Euler(0, 0, spriteFaceLeft ? -viewDirection : viewDirection) * forward;
 
         if (GetComponent<SpriteRenderer>().flipX)
-        {
             forward.x = -forward.x;
-        }
 
         Vector3 endpoint = transform.position + (Quaternion.Euler(0, 0, viewFOV * 0.5f) * forward);
 
@@ -575,13 +636,9 @@ public class EnemyMeleeRangePropertyDrawer : PropertyDrawer
     {
         SerializedProperty viewRangeProperty = property.serializedObject.FindProperty("viewDistance");
         if (viewRangeProperty.floatValue < property.floatValue)
-        {
             return base.GetPropertyHeight(property, label) + 30;
-        }
         else
-        {
             return base.GetPropertyHeight(property, label);
-        }
     }
 }
 #endif

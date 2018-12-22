@@ -13,6 +13,7 @@ public class PlayerCharacterEditor : Editor
     SerializedProperty facingRightBulletSpawnPointProperty;
     SerializedProperty bulletPoolProperty;
     SerializedProperty cameraFollowTargetProperty;
+    SerializedProperty boyProperty;
 
     SerializedProperty maxSpeedProperty;
     SerializedProperty groundAccelerationProperty;
@@ -25,8 +26,12 @@ public class PlayerCharacterEditor : Editor
     SerializedProperty jumpSpeedProperty;
     SerializedProperty jumpAbortSpeedReductionProperty;
 
-    SerializedProperty wallSlideVertSpeedReductionProperty;
-    SerializedProperty wallSlideJumpAngleProperty;
+    SerializedProperty wallSlideUpGravityProperty;
+    SerializedProperty wallSlideDownGravityProperty;
+    SerializedProperty wallSlideJumpXProperty;
+    SerializedProperty wallSlideJumpYProperty;
+    SerializedProperty wallSlideTimeoutDurationProperty;
+    SerializedProperty wallSlideCooldownDurationProperty;
     SerializedProperty canWallSlideUpProperty;
     SerializedProperty wallSlideUpSpeedProperty;
 
@@ -75,6 +80,7 @@ public class PlayerCharacterEditor : Editor
     readonly GUIContent facingRightBulletSpawnPointContent = new GUIContent("Facing Right Bullet Spawn Point");
     readonly GUIContent bulletPoolContent = new GUIContent("Bullet Pool");
     readonly GUIContent cameraFollowTargetContent = new GUIContent("Camera Follow Target");
+    readonly GUIContent boyContent = new GUIContent("Boy");
 
     readonly GUIContent maxSpeedContent = new GUIContent("Max Speed");
     readonly GUIContent groundAccelerationContent = new GUIContent("Ground Acceleration");
@@ -87,8 +93,12 @@ public class PlayerCharacterEditor : Editor
     readonly GUIContent jumpSpeedContent = new GUIContent("Jump Speed");
     readonly GUIContent jumpAbortSpeedReductionContent = new GUIContent("Jump Abort Speed Reduction");
 
-    readonly GUIContent wallSlideVertSpeedReductionContent = new GUIContent("Vertical Speed Reduction");
-    readonly GUIContent wallSlideJumpAngleContent = new GUIContent("Jump Angle");
+    readonly GUIContent wallSlideUpGravityContent = new GUIContent("Slide Up Gravity");
+    readonly GUIContent wallSlideDownGravityContent = new GUIContent("Slide Down Gravity");
+    readonly GUIContent wallSlideJumpXContent = new GUIContent("Slide Jump X Vector");
+    readonly GUIContent wallSlideJumpYContent = new GUIContent("Slide Jump Y Vector");
+    readonly GUIContent wallSlideTimeoutDurationContent = new GUIContent("Slide Timeout Duration");
+    readonly GUIContent wallSlideCooldownDurationContent = new GUIContent("Cooldown Duration");
     readonly GUIContent canWallSlideUpContent = new GUIContent("Can Wall Slide Up");
     readonly GUIContent wallSlideUpSpeedContent = new GUIContent("Slide Up Speed");
 
@@ -139,6 +149,7 @@ public class PlayerCharacterEditor : Editor
         facingRightBulletSpawnPointProperty = serializedObject.FindProperty("facingRightBulletSpawnPoint");
         bulletPoolProperty = serializedObject.FindProperty("bulletPool");
         cameraFollowTargetProperty = serializedObject.FindProperty("cameraFollowTarget");
+        boyProperty = serializedObject.FindProperty("boy");
 
         maxSpeedProperty = serializedObject.FindProperty("maxSpeed");
         groundAccelerationProperty = serializedObject.FindProperty("groundAcceleration");
@@ -151,8 +162,12 @@ public class PlayerCharacterEditor : Editor
         jumpSpeedProperty = serializedObject.FindProperty("jumpSpeed");
         jumpAbortSpeedReductionProperty = serializedObject.FindProperty("jumpAbortSpeedReduction");
 
-        wallSlideVertSpeedReductionProperty = serializedObject.FindProperty("wallSlideVertSpeedReduction");
-        wallSlideJumpAngleProperty = serializedObject.FindProperty("wallSlideJumpAngle");
+        wallSlideUpGravityProperty = serializedObject.FindProperty("wallSlideUpGravity");
+        wallSlideDownGravityProperty = serializedObject.FindProperty("wallSlideDownGravity");
+        wallSlideJumpXProperty = serializedObject.FindProperty("wallSlideJumpX");
+        wallSlideJumpYProperty = serializedObject.FindProperty("wallSlideJumpY");
+        wallSlideTimeoutDurationProperty = serializedObject.FindProperty("wallSlideTimeoutDuration");
+        wallSlideCooldownDurationProperty = serializedObject.FindProperty("wallSlideCooldownDuration");
         canWallSlideUpProperty = serializedObject.FindProperty("canWallSlideUp");
         wallSlideUpSpeedProperty = serializedObject.FindProperty("wallSlideUpSpeed");
 
@@ -202,6 +217,7 @@ public class PlayerCharacterEditor : Editor
             EditorGUILayout.PropertyField(facingRightBulletSpawnPointProperty, facingRightBulletSpawnPointContent);
             EditorGUILayout.PropertyField(bulletPoolProperty, bulletPoolContent);
             EditorGUILayout.PropertyField(cameraFollowTargetProperty, cameraFollowTargetContent);
+            EditorGUILayout.PropertyField(boyProperty, boyContent);
         }
 
         EditorGUI.indentLevel--;
@@ -247,8 +263,12 @@ public class PlayerCharacterEditor : Editor
 
         if (wallSlideSettingsFoldout)
         {
-            EditorGUILayout.PropertyField(wallSlideVertSpeedReductionProperty, wallSlideVertSpeedReductionContent);
-            EditorGUILayout.PropertyField(wallSlideJumpAngleProperty, wallSlideJumpAngleContent);
+            EditorGUILayout.PropertyField(wallSlideUpGravityProperty, wallSlideUpGravityContent);
+            EditorGUILayout.PropertyField(wallSlideDownGravityProperty, wallSlideDownGravityContent);
+            EditorGUILayout.PropertyField(wallSlideJumpXProperty, wallSlideJumpXContent);
+            EditorGUILayout.PropertyField(wallSlideJumpYProperty, wallSlideJumpYContent);
+            EditorGUILayout.PropertyField(wallSlideTimeoutDurationProperty, wallSlideTimeoutDurationContent);
+            EditorGUILayout.PropertyField(wallSlideCooldownDurationProperty, wallSlideCooldownDurationContent);
             EditorGUILayout.PropertyField(canWallSlideUpProperty, canWallSlideUpContent);
             if (canWallSlideUpProperty.boolValue == true)
             {

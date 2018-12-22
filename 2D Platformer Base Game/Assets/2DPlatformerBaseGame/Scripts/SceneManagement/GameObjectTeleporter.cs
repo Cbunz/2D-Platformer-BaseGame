@@ -9,17 +9,13 @@ public class GameObjectTeleporter : MonoBehaviour {
     {
         get
         {
-            if (Instance != null)
-            {
+            if (instance != null)
                 return instance;
-            }
 
             instance = FindObjectOfType<GameObjectTeleporter>();
 
             if (instance != null)
-            {
                 return instance;
-            }
 
             GameObject gameObjectTeleporter = new GameObject("GameObjectTeleporter");
             instance = gameObjectTeleporter.AddComponent<GameObjectTeleporter>();
@@ -72,28 +68,20 @@ public class GameObjectTeleporter : MonoBehaviour {
         if (releaseControl)
         {
             if (playerInput == null)
-            {
                 playerInput = FindObjectOfType<PlayerInput>();
-            }
             playerInput.ReleaseControl(resetInputValues);
         }
         
         if (fade)
-        {
             yield return StartCoroutine(ScreenFader.FadeSceneOut());
-        }
 
         transitioningGameObject.transform.position = destinationPosition;
         
         if (fade)
-        {
             yield return StartCoroutine(ScreenFader.FadeSceneIn());
-        }
 
         if (releaseControl)
-        {
             playerInput.GainControl();
-        }
 
         transitioning = false;
     }
@@ -104,9 +92,7 @@ public class GameObjectTeleporter : MonoBehaviour {
         for (int i = 0; i < entrances.Length; i++)
         {
             if (entrances[i].destinationTag == destinationTag)
-            {
                 return entrances[i];
-            }
         }
         Debug.LogWarning("No entrance was found with the " + destinationTag + " tag.");
         return null;

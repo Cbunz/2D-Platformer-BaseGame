@@ -7,22 +7,13 @@ using UnityEngine.Events;
 public class Damageable : MonoBehaviour, IDataPersister
 {
     [Serializable]
-    public class HealthEvent : UnityEvent<Damageable>
-    {
-
-    }
+    public class HealthEvent : UnityEvent<Damageable> { }
 
     [Serializable]
-    public class DamageEvent : UnityEvent<Damager, Damageable>
-    {
-
-    }
+    public class DamageEvent : UnityEvent<Damager, Damageable> { }
 
     [Serializable]
-    public class HealEvent : UnityEvent<int, Damageable>
-    {
-
-    }
+    public class HealEvent : UnityEvent<int, Damageable> { }
 
     public int startingHealth = 5;
     public bool invulnerableAfterDamage = true;
@@ -106,6 +97,8 @@ public class Damageable : MonoBehaviour, IDataPersister
 
         damageDirection = transform.position + (Vector3)centerOffset - damager.transform.position;
 
+        if (damager.forceRespawn)
+            damageDirection = Vector3.zero;
         OnTakeDamage.Invoke(damager, this);
 
         if (currentHealth <= 0)
@@ -137,6 +130,7 @@ public class Damageable : MonoBehaviour, IDataPersister
     public void SetHealth(int amount)
     {
         currentHealth = amount;
+        Debug.Log("Health: " + currentHealth);
 
         OnHealthSet.Invoke(this);
     }

@@ -19,13 +19,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4598631757733450}
+  - component: {fileID: 114196621046132704}
   - component: {fileID: 212755295613437238}
   - component: {fileID: 61868127187656110}
   - component: {fileID: 50418328400281120}
-  - component: {fileID: 114196621046132704}
   - component: {fileID: 114286531322818362}
   - component: {fileID: 114525918402448380}
-  m_Layer: 16
+  m_Layer: 19
   m_Name: Bullet
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -106,30 +106,19 @@ MonoBehaviour:
   size: {x: 0.375, y: 0.1875}
   offsetBasedOnSpriteFacing: 0
   spriteRenderer: {fileID: 0}
-  canHitTriggers: 0
+  canHitTriggers: 1
   disableDamageAfterHit: 0
   forceRespawn: 0
   ignoreInvincibility: 0
   hittableLayers:
     serializedVersion: 2
-    m_Bits: 33280
+    m_Bits: 157696
   OnDamageableHit:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 114286531322818362}
         m_MethodName: OnHitDamageable
         m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 114286531322818362}
-        m_MethodName: ReturnToPool
-        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -146,17 +135,6 @@ MonoBehaviour:
       - m_Target: {fileID: 114286531322818362}
         m_MethodName: OnHitNonDamageable
         m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 114286531322818362}
-        m_MethodName: ReturnToPool
-        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -227,8 +205,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1175573969
-  m_SortingLayer: 3
+  m_SortingLayerID: -540036845
+  m_SortingLayer: 8
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 45813845edae3754596ce96548ea5651, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}

@@ -8,7 +8,7 @@ public class InteractOnTrigger2D : MonoBehaviour {
 
     public LayerMask layers;
     public UnityEvent OnEnter, OnExit;
-    public InventoryController.InventoryChecker[] inventoryChecks;
+    public InventoryController.InventoryChecker inventoryCheck;
 
     protected Collider2D _collider;
 
@@ -40,10 +40,7 @@ public class InteractOnTrigger2D : MonoBehaviour {
     protected virtual void ExecuteOnEnter(Collider2D other)
     {
         OnEnter.Invoke();
-        for (int i = 0; i < inventoryChecks.Length; i++)
-        {
-            inventoryChecks[i].CheckInventory(other.GetComponentInChildren<InventoryController>());
-        }
+        inventoryCheck.CheckInventory(other.GetComponentInChildren<InventoryController>());
     }
 
     protected virtual void ExecuteOnExit(Collider2D other)

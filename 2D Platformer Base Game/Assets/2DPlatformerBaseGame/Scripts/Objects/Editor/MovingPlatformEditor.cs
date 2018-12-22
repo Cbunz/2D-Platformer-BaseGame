@@ -47,6 +47,7 @@ public class MovingPlatformEditor : Editor {
 
         EditorGUILayout.BeginVertical("box");
         EditorGUI.BeginChangeCheck();
+        
         bool isStartingMoving = EditorGUILayout.Toggle("Start moving", movingPlatform.isMovingAtStart);
         if (EditorGUI.EndChangeCheck())
         {
@@ -66,10 +67,22 @@ public class MovingPlatformEditor : Editor {
             }
             EditorGUI.indentLevel -= 1;
         }
+        
         EditorGUILayout.EndVertical();
 
+        if (!isStartingMoving)
+        {
+            EditorGUI.BeginChangeCheck();
+            string newTriggerTag = EditorGUILayout.TextField("Trigger Tag", movingPlatform.triggerTag);
+            if (EditorGUI.EndChangeCheck())
+            {
+                Undo.RecordObject(target, "Change Trigger Tag");
+                movingPlatform.triggerTag = newTriggerTag;
+            }
+        }
+
         EditorGUI.BeginChangeCheck();
-        MovingPlatform.MovingPlatformType platformType = (MovingPlatform.MovingPlatformType)EditorGUILayout.EnumPopup("Looping", movingPlatform.platformType);
+        MovingPlatform.MovingPlatformType platformType = (MovingPlatform.MovingPlatformType)EditorGUILayout.EnumPopup("Platform Type", movingPlatform.platformType);
         if (EditorGUI.EndChangeCheck())
         {
             Undo.RecordObject(target, "Changed Moving Platform type");

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 [SelectionBase]
 [RequireComponent(typeof(Rigidbody2D))]
@@ -10,15 +11,17 @@ public class MovingPlatform : MonoBehaviour {
     {
         BackForth,
         Loop,
-        Once
+        Once,
+        TriggerLoop
     }
 
     public PlatformCatcher platformCatcher;
     public float speed = 1.0f;
     public MovingPlatformType platformType;
-
+    
+    public string triggerTag;
     public bool startMovingOnlyWhenVisible;
-    public bool isMovingAtStart = true;
+    public bool isMovingAtStart = false;
 
     [HideInInspector]
     public Vector3[] localNodes = new Vector3[1];
@@ -39,6 +42,7 @@ public class MovingPlatform : MonoBehaviour {
 
     protected bool started = false;
     protected bool veryFirstStart = false;
+    
 
     public Vector2 Velocity
     {
@@ -57,6 +61,18 @@ public class MovingPlatform : MonoBehaviour {
         {
             platformCatcher = GetComponent<PlatformCatcher>();
         }
+    }
+
+    private void OnEnable()
+    {
+        EventManager.StartListening("TriggerPlatformStart", TriggerPlatformStart);
+        EventManager.StartListening("TriggerPlatformStop", TriggerPlatformStop);
+    }
+
+    private void OnDisable()
+    {
+        EventManager.StopListening("TriggerPlatformStart", TriggerPlatformStart);
+        EventManager.StopListening("TriggerPlatformStop", TriggerPlatformStop);
     }
 
     private void Start()
@@ -127,6 +143,7 @@ public class MovingPlatform : MonoBehaviour {
 
         while (distanceToGo > 0)
         {
+            Debug.Log("Next: " + next);
             Vector2 direction = worldNode[next] - transform.position;
 
             float dist = distanceToGo;
@@ -154,9 +171,19 @@ public class MovingPlatform : MonoBehaviour {
                                 break;
                             case MovingPlatformType.Once:
                                 next -= 1;
-                                StopMoving();
+                                started = false;
+                                break;
+                            case MovingPlatformType.TriggerLoop:
+                                next = 0;
                                 break;
                         }
+                    }
+
+                    if (platformType == MovingPlatformType.TriggerLoop)
+                    {
+                        started = false;
+                        EventManager.TriggerEvent("TriggerSwitchReset", triggerTag);
+                        return;
                     }
                 }
             }
@@ -175,14 +202,16 @@ public class MovingPlatform : MonoBehaviour {
         }
     }
 
-    public void StartMoving()
+    public void TriggerPlatformStart(string tag)
     {
-        started = true;
+        if (tag == triggerTag)
+            started = true;
     }
 
-    public void StopMoving()
+    public void TriggerPlatformStop(string tag)
     {
-        started = false;
+        if (tag == triggerTag)
+            started = false;
     }
 
     public void ResetPlatform()
@@ -193,7 +222,7 @@ public class MovingPlatform : MonoBehaviour {
 
     private void BecameVisible(VisibleBubbleUp obj)
     {
-        if (veryFirstStart)
+        if (veryFirstStart && isMovingAtStart)
         {
             started = true;
             veryFirstStart = false;

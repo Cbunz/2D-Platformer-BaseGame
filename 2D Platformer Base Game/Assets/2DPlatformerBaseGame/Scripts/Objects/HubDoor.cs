@@ -6,7 +6,14 @@ using UnityEngine.Events;
 
 public class HubDoor : MonoBehaviour, IDataPersister
 {
-    public string[] requiredInventoryItemKeys;
+    [Serializable]
+    public struct NeededItems
+    {
+        public string item;
+        public int amount;
+    }
+    public NeededItems[] neededItems;
+    
     public Sprite[] unlockStateSprites;
 
     public DirectorTrigger keyDirectorTrigger;
@@ -15,14 +22,15 @@ public class HubDoor : MonoBehaviour, IDataPersister
     public DataSettings dataSettings;
 
     SpriteRenderer spriteRenderer;
+    Dictionary<string, int> requiredInventory;
 
     [ContextMenu("Update State")]
     void CheckInventory()
     {
         var stateIndex = -1;
-        foreach (var i in requiredInventoryItemKeys)
+        foreach (KeyValuePair<string, int> item in requiredInventory)
         {
-            if (characterInventory.HasItem(i))
+            if (characterInventory.HasItem(item.Key))
             {
                 stateIndex++;
             }
@@ -31,13 +39,17 @@ public class HubDoor : MonoBehaviour, IDataPersister
         {
             keyDirectorTrigger.OverrideAlreadyTriggered(true);
             spriteRenderer.sprite = unlockStateSprites[stateIndex];
-            if (stateIndex == requiredInventoryItemKeys.Length - 1)
+            if (stateIndex == requiredInventory.Count - 1)
                 onUnlocked.Invoke();
         }
     }
 
     void OnEnable()
     {
+        foreach (NeededItems nItem in neededItems)
+        {
+            requiredInventory.Add(nItem.item, nItem.amount);
+        }
         spriteRenderer = GetComponent<SpriteRenderer>();
         characterInventory.OnInventoryLoaded += CheckInventory;
     }

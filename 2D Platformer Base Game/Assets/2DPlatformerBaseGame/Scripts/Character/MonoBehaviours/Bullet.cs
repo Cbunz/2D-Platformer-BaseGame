@@ -43,29 +43,27 @@ public class Bullet : MonoBehaviour {
                             screenPoint.x < (1 + offScreenError) && screenPoint.y > -offScreenError &&
                             screenPoint.y < (1 + offScreenError);
             if (!onScreen)
-            {
                 bulletPoolObject.ReturnToPool();
-            }
         }
 
         if (timeBeforeAutodestruct > 0)
         {
             timer += Time.deltaTime;
             if (timer > timeBeforeAutodestruct)
-            {
                 bulletPoolObject.ReturnToPool();
-            }
         }
     }
 
     public void OnHitDamageable(Damager origin, Damageable damageable)
     {
         FindSurface(origin.LastHit);
+        bulletPoolObject.ReturnToPool();
     }
 
     public void OnHitNonDamageable(Damager origin)
     {
         FindSurface(origin.LastHit);
+        bulletPoolObject.ReturnToPool();
     }
 
     protected void FindSurface(Collider2D collider)

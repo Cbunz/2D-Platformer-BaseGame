@@ -21,8 +21,8 @@ public class Damager : MonoBehaviour
     public Collider2D LastHit { get { return lastHit; } }
 
     public int damage = 1;
-    public Vector2 offset = new Vector2(1.5f, 1f);
-    public Vector2 size = new Vector2(2.5f, 1f);
+    public Vector2 offset = Vector2.zero;
+    public Vector2 size = new Vector2(2f, 2f);
     public bool offsetBasedOnSpriteFacing = true;
     public SpriteRenderer spriteRenderer;
     public bool canHitTriggers;

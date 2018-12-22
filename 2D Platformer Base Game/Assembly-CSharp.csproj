@@ -61,36 +61,41 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\AttackingAI.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\CubeAI.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\FlyingEnemyScript.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\MiddleLevelAI.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\player_Enter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\BoyController.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\BT.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\AI\SendSignal.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Audio\AudioSurface.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Audio\BackgroundMusicPlayer.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Audio\RandomAudioPlayer.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\BoulderTrap.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\Bullet.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\BulletPool.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\CharacterController2D.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\Damageable.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\Damager.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\EnemyBehaviour.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\EnemyPatrol.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\InputComponent.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\PlayerCharacter.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\PlayerInput.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\AirborneRangedSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\AirborneSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\AirMeleeAttackSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\DeathLandingSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\DeathSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\MeleeAttackSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\MovementRangedSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\MovementSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\RespawnSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\SceneLinkedSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\TakeDamageSMB.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\WallSlideSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\MonoBehaviours\Shield.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Enemy\GhostAirborneSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Enemy\GhostDeathSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Enemy\GhostPatrolSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\AirborneRangedSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\AirborneSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\AirMeleeAttackSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\DeathLandingSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\DeathSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\MeleeAttackSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\MovementRangedSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\MovementSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\PushingSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\RespawnSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\SceneLinkedSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\TakeDamageSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Character\StateMachineBehaviours\Player\WallSlideSMB.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\AbilityPickup.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\CameraShaker.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\Checkpoint.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InteractOnButton2D.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InteractOnCollision2D.cs" />
@@ -99,15 +104,29 @@
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\InventoryItem.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\LayerMaskExtensions.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Core\ObjectPool.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\DialogueTrigger.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\EnemySpawner.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\HealthPickup.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\FakeTerrain.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\FallRespawn.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\HubDoor.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\ChestParameterSetter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\HealthPickup.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\ItemDispenser.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\KeyToItem.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\Launcher.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\Shatter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\ShatterPieces.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Items\WeaponPickup.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Obstacles\Boulder.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Obstacles\BoulderTrap.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Obstacles\Switch.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Platforms\MovingPlatform.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Platforms\PlatformCatcher.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Platforms\TileControl.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\Pushables\Pushable.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Objects\WeaponPickup.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\CameraFollow.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\CharacterStateSetter.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\EventManager.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\GameObjectTeleporter.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\IDataPersister.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\PersistentDataManager.cs" />
@@ -119,12 +138,64 @@
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\ScreenFader.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\SceneManagement\TransitionPoint.cs" />
     <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Timeline\DirectorTrigger.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\Helpers.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\PhysicsHelper.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\SetMaterialRenderQueue.cs" />
-    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utility\VisibleBubbleUp.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\UI\CoinUI.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\UI\HealthUI.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\UI\ItemUI.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\UI\MenuActivityController.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\UI\StartUI.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\AutoCameraSetup.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\DialogueCanvasController.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\EditModeGizmos.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Helpers.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\PhysicsHelper.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\RoutineHelper.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\SetMaterialRenderQueue.cs" />
+    <Compile Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\VisibleBubbleUp.cs" />
+    <Compile Include="Assets\ScreenShot.cs" />
+    <Compile Include="Assets\Universal Pixel Hero (Warrior)\Scripts\Controller.cs" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\NormalMappedSprite-Animated.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Custom-Atlas.shader" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\NormalMappedSprite.shader" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\Particle Standard Unlit.shader" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\Shield.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\Water.shader" />
+    <None Include="Assets\TextMesh Pro\Sprites\EmojiOne Attribution.txt" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\UnityStandardParticleShadow.cginc" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\UnityStandardParticles.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF Overlay.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Fonts\Rajdhani\OFL.txt" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\NormalMappedTile.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Bitmap.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMPro.cginc" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\FrostedGlass.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF.shader" />
+    <None Include="Assets\Pixel Font - Tripfive\_README.txt" />
+    <None Include="Assets\2DPlatformerBaseGame\Scripts\Utilities\Shaders\NormalMappedTileAnimated.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
     <Reference Include="Cinemachine">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Cinemachine.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.PixelPerfect.Editor">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.2D.PixelPerfect.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProGrids">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.ProGrids.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.SpriteShape.Editor">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.2D.SpriteShape.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.ProGrids.Editor">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.ProGrids.Editor.dll</HintPath>
     </Reference>
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
@@ -135,11 +206,29 @@
     <Reference Include="Unity.PackageManagerUI.Editor">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
     </Reference>
+    <Reference Include="Unity.InternalAPIEngineBridge.001">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.InternalAPIEngineBridge.001.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.Common.Runtime">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.2D.Common.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.SpriteShape.Runtime">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.2D.SpriteShape.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.PixelPerfect">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.2D.PixelPerfect.dll</HintPath>
+    </Reference>
     <Reference Include="com.unity.cinemachine.editor">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/com.unity.cinemachine.editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.TextMeshPro">
       <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.2D.Common.Editor">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.2D.Common.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.InternalAPIEditorBridge.001">
+      <HintPath>C:/Users/Connor/Desktop/Unity Projects/Github Repositories/2D-Platformer-BaseGame/2D Platformer Base Game/Library/ScriptAssemblies/Unity.InternalAPIEditorBridge.001.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.AIModule">
       <HintPath>C:/Program Files/Unity/Hub/Editor/2018.2.2f1/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>

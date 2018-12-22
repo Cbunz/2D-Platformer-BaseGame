@@ -5,57 +5,66 @@ using UnityEngine;
 
 [RequireComponent(typeof(Collider2D))]
 [RequireComponent(typeof(Rigidbody2D))]
-public class CharacterController2D : MonoBehaviour {
-
+public class CharacterController2D : MonoBehaviour
+{
     public LayerMask groundedLayerMask;
     public float groundedRaycastDistance = 0.1f;
-
-    BoxCollider2D _collider;
-    // BoxCollider2D colliderBox;
-    // CapsuleCollider2D colliderCapsule;
-    // Collider2D _collider;
-    // private bool hasBoxCollider;
+    
+    CapsuleCollider2D _collider;
     Rigidbody2D _rigidbody;
-    ContactFilter2D contactFilter;
-    RaycastHit2D[] hitResults = new RaycastHit2D[5];
-    RaycastHit2D[] foundHits = new RaycastHit2D[3];
+    ContactFilter2D groundContactFilter;
+    
+    RaycastHit2D[] groundHitResults = new RaycastHit2D[5];
+    RaycastHit2D[] groundFoundHits = new RaycastHit2D[3];
     Collider2D[] groundColliders = new Collider2D[3];
-    Vector2[] raycastPositions = new Vector2[3];
+    Vector2[] groundRaycastPositions = new Vector2[3];
     Vector2 previousPosition;
     Vector2 currentPosition;
     Vector2 nextMovement;
 
     public bool Grounded { get; protected set; }
     public bool OnCeiling { get; protected set; }
+    public bool ReachedEdge { get; protected set; }
     public Vector2 Velocity { get; protected set; }
     public Rigidbody2D Rigidbody { get { return _rigidbody; } }
     public Collider2D[] GroundColliders { get { return groundColliders; } }
-    public ContactFilter2D ContactFilter { get { return contactFilter; } }
+    public ContactFilter2D GroundContactFilter { get { return groundContactFilter; } }
 
+    // Wall Slide
+
+    public bool useWallDetect = true;
+    public bool detectBothSides = false;
+    public bool spriteOriginallyFacesLeft;
+    public SpriteRenderer spriteRenderer;
+    public LayerMask wallLayerMask;
+    public float wallRaycastDistance = 0.1f;
+
+    ContactFilter2D wallContactFilter;
+
+    RaycastHit2D[] wallHitResults = new RaycastHit2D[5];
+    RaycastHit2D[] wallFoundHits = new RaycastHit2D[3];
+    Collider2D[] wallColliders = new Collider2D[3];
+    Vector2[] wallRaycastPositions = new Vector2[3];
+
+    public bool TouchingWall { get; protected set; }
+    public Collider2D[] WallColliders { get { return wallColliders; } }
+    public ContactFilter2D WallContactFilter { get { return wallContactFilter; } }
 
     void Awake()
     {
         _rigidbody = GetComponent<Rigidbody2D>();
-        _collider = GetComponent<BoxCollider2D>();
-
-        /* colliderBox = GetComponent<BoxCollider2D>();
-        colliderCapsule = GetComponent<CapsuleCollider2D>();
-        if (colliderBox != null)
-        {
-            hasBoxCollider = true;
-        }
-        else if (colliderCapsule != null)
-        {
-            hasBoxCollider = false;
-        }
-        */
+        _collider = GetComponent<CapsuleCollider2D>();
 
         currentPosition = _rigidbody.position;
         previousPosition = _rigidbody.position;
 
-        contactFilter.layerMask = groundedLayerMask;
-        contactFilter.useLayerMask = true;
-        contactFilter.useTriggers = false;
+        groundContactFilter.layerMask = groundedLayerMask;
+        groundContactFilter.useLayerMask = true;
+        groundContactFilter.useTriggers = false;
+
+        wallContactFilter.layerMask = wallLayerMask;
+        wallContactFilter.useLayerMask = true;
+        wallContactFilter.useTriggers = false;
 
         Physics2D.queriesStartInColliders = false;
     }
@@ -65,12 +74,17 @@ public class CharacterController2D : MonoBehaviour {
         previousPosition = _rigidbody.position;
         currentPosition = previousPosition + nextMovement;
         Velocity = (currentPosition - previousPosition) / Time.deltaTime;
-
         _rigidbody.MovePosition(currentPosition);
         nextMovement = Vector2.zero;
 
         CheckCapsuleEndCollisions();
         CheckCapsuleEndCollisions(false);
+        if (useWallDetect)
+        {
+            if (detectBothSides)
+                CheckWallCollisions(true);
+            CheckWallCollisions();
+        }
     }
 
     public void Move(Vector2 movement)
@@ -86,7 +100,136 @@ public class CharacterController2D : MonoBehaviour {
         _rigidbody.MovePosition(position);
     }
 
-    
+    public void CheckWallCollisions(bool otherDirection = false)
+    {
+        Vector2 raycastDirection;
+        Vector2 raycastStart;
+        float raycastDistance;
+        bool faceLeft = spriteRenderer.flipX != spriteOriginallyFacesLeft ? true : false;
+        if (otherDirection)
+            faceLeft = !faceLeft;
+
+        if (_collider == null)
+        {
+            raycastStart = _rigidbody.position + Vector2.up;
+            raycastDistance = 1f + wallRaycastDistance;
+
+            if (faceLeft)
+            {
+                raycastDirection = Vector2.left;
+
+                wallRaycastPositions[0] = raycastStart + Vector2.up * 0.4f;
+                wallRaycastPositions[1] = raycastStart;
+                wallRaycastPositions[2] = raycastStart + Vector2.down * 0.4f;
+            }
+            else
+            {
+                raycastDirection = Vector2.right;
+
+                wallRaycastPositions[0] = raycastStart + Vector2.up * 0.4f;
+                wallRaycastPositions[1] = raycastStart;
+                wallRaycastPositions[2] = raycastStart + Vector2.down * 0.4f;
+            }
+        }
+        else
+        {
+            raycastStart = _rigidbody.position + _collider.offset;
+            raycastDistance = _collider.size.x * .5f + groundedRaycastDistance * 2f;
+
+            if (faceLeft)
+            {
+                raycastDirection = Vector2.left;
+                Vector2 raycastStartLeftCenter = raycastStart + Vector2.left * (_collider.size.y * 0.5f - _collider.size.x * 0.5f);
+
+                wallRaycastPositions[0] = raycastStartLeftCenter + Vector2.up * _collider.size.x * 0.5f;
+                wallRaycastPositions[1] = raycastStartLeftCenter;
+                wallRaycastPositions[2] = raycastStartLeftCenter + Vector2.down * _collider.size.x * 0.5f;
+            }
+            else
+            {
+                raycastDirection = Vector2.right;
+                Vector2 raycastStartLeftCenter = raycastStart + Vector2.right * (_collider.size.y * 0.5f - _collider.size.x * 0.5f);
+
+                wallRaycastPositions[0] = raycastStartLeftCenter + Vector2.up * _collider.size.x * 0.5f;
+                wallRaycastPositions[1] = raycastStartLeftCenter;
+                wallRaycastPositions[2] = raycastStartLeftCenter + Vector2.down * _collider.size.x * 0.5f;
+            }
+        }
+
+        for (int i = 0; i < wallRaycastPositions.Length; i++)
+        {
+            int count = Physics2D.Raycast(wallRaycastPositions[i], raycastDirection, wallContactFilter, wallHitResults, raycastDistance);
+
+            wallFoundHits[i] = count > 0 ? wallHitResults[0] : new RaycastHit2D();
+            wallColliders[i] = wallFoundHits[i].collider;
+        }
+
+        Vector2 wallNormal = Vector2.zero;
+        int hitCount = 0;
+
+        for (int i = 0; i < wallFoundHits.Length; i++)
+        {
+            if (wallFoundHits[i].collider != null)
+            {
+                wallNormal += wallFoundHits[i].normal;
+                hitCount++;
+            }
+        }
+
+        if (hitCount > 0)
+        {
+            wallNormal.Normalize();
+        }
+
+        Vector2 relativeVelocity = _rigidbody.velocity;
+
+        for (int i = 0; i < wallColliders.Length; i++)
+        {
+            if (wallColliders[i] == null)
+            {
+                continue;
+            }
+
+            MovingPlatform movingPlatform;
+
+            if (PhysicsHelper.TryGetMovingPlatform(wallColliders[i], out movingPlatform))
+            {
+                relativeVelocity -= movingPlatform.Velocity / Time.deltaTime;
+                break;
+            }
+        }
+
+        if (Mathf.Approximately(wallNormal.x, 0f) && Mathf.Approximately(wallNormal.y, 0f))
+        {
+            TouchingWall = false;
+        }
+        else
+        {
+            if (faceLeft)
+            {
+                TouchingWall = (relativeVelocity.x >= 0f);
+
+                if (_collider != null)
+                {
+                    if (wallColliders[1] != null)
+                    {
+                        float colliderLeftWidth = _rigidbody.position.x + _collider.offset.x - _collider.size.x * 0.5f;
+                        float middleHitWidth = wallFoundHits[1].point.x;
+                        TouchingWall &= (middleHitWidth < colliderLeftWidth + wallRaycastDistance);
+                    }
+                }
+            }
+            else
+            {
+                TouchingWall = (relativeVelocity.x <= 0f);
+            }
+        }
+
+        for (int i = 0; i < wallHitResults.Length; i++)
+        {
+            wallHitResults[i] = new RaycastHit2D();
+        }
+    }
 
     public void CheckCapsuleEndCollisions(bool bottom = true)
     {
@@ -103,17 +246,17 @@ public class CharacterController2D : MonoBehaviour {
             {
                 raycastDirection = Vector2.down;
 
-                raycastPositions[0] = raycastStart + Vector2.left * 0.4f;
-                raycastPositions[1] = raycastStart;
-                raycastPositions[2] = raycastStart + Vector2.right * 0.4f;
+                groundRaycastPositions[0] = raycastStart + Vector2.left * 0.4f;
+                groundRaycastPositions[1] = raycastStart;
+                groundRaycastPositions[2] = raycastStart + Vector2.right * 0.4f;
             }
             else
             {
                 raycastDirection = Vector2.up;
 
-                raycastPositions[0] = raycastStart + Vector2.left * 0.4f;
-                raycastPositions[1] = raycastStart;
-                raycastPositions[2] = raycastStart + Vector2.right * 0.4f;
+                groundRaycastPositions[0] = raycastStart + Vector2.left * 0.4f;
+                groundRaycastPositions[1] = raycastStart;
+                groundRaycastPositions[2] = raycastStart + Vector2.right * 0.4f;
             }
         }
         else
@@ -126,39 +269,39 @@ public class CharacterController2D : MonoBehaviour {
                 raycastDirection = Vector2.down;
                 Vector2 raycastStartBottomCenter = raycastStart + Vector2.down * (_collider.size.y * 0.5f - _collider.size.x * 0.5f);
 
-                raycastPositions[0] = raycastStartBottomCenter + Vector2.left * _collider.size.x * 0.5f;
-                raycastPositions[1] = raycastStartBottomCenter;
-                raycastPositions[2] = raycastStartBottomCenter + Vector2.right * _collider.size.x * 0.5f;
+                groundRaycastPositions[0] = raycastStartBottomCenter + Vector2.left * _collider.size.x * 0.5f;
+                groundRaycastPositions[1] = raycastStartBottomCenter;
+                groundRaycastPositions[2] = raycastStartBottomCenter + Vector2.right * _collider.size.x * 0.5f;
             }
             else
             {
                 raycastDirection = Vector2.up;
                 Vector2 raycastStartTopCenter = raycastStart + Vector2.up * (_collider.size.y * 0.5f - _collider.size.x * 0.5f);
 
-                raycastPositions[0] = raycastStartTopCenter + Vector2.left * _collider.size.x * 0.5f;
-                raycastPositions[1] = raycastStartTopCenter;
-                raycastPositions[2] = raycastStartTopCenter + Vector2.right * _collider.size.x * 0.5f;
+                groundRaycastPositions[0] = raycastStartTopCenter + Vector2.left * _collider.size.x * 0.5f;
+                groundRaycastPositions[1] = raycastStartTopCenter;
+                groundRaycastPositions[2] = raycastStartTopCenter + Vector2.right * _collider.size.x * 0.5f;
             }
         }
 
-        for (int i = 0; i < raycastPositions.Length; i++)
+        for (int i = 0; i < groundRaycastPositions.Length; i++)
         {
-            int count = Physics2D.Raycast(raycastPositions[i], raycastDirection, contactFilter, hitResults, raycastDistance);
+            int count = Physics2D.Raycast(groundRaycastPositions[i], raycastDirection, groundContactFilter, groundHitResults, raycastDistance);
 
             if (bottom)
             {
-                foundHits[i] = count > 0 ? hitResults[0] : new RaycastHit2D();
-                groundColliders[i] = foundHits[i].collider;
+                groundFoundHits[i] = count > 0 ? groundHitResults[0] : new RaycastHit2D();
+                groundColliders[i] = groundFoundHits[i].collider;
             }
             else
             {
                 OnCeiling = false;
 
-                for (int j = 0; j < hitResults.Length; j++)
+                for (int j = 0; j < groundHitResults.Length; j++)
                 {
-                    if (hitResults[j].collider != null)
+                    if (groundHitResults[j].collider != null)
                     {
-                        if (!PhysicsHelper.ColliderHasPlatformEffector(hitResults[j].collider))
+                        if (!PhysicsHelper.ColliderHasPlatformEffector(groundHitResults[j].collider))
                         {
                             OnCeiling = true;
                         }
@@ -172,11 +315,11 @@ public class CharacterController2D : MonoBehaviour {
             Vector2 groundNormal = Vector2.zero;
             int hitCount = 0;
 
-            for (int i = 0; i < foundHits.Length; i++)
+            for (int i = 0; i < groundFoundHits.Length; i++)
             {
-                if (foundHits[i].collider != null)
+                if (groundFoundHits[i].collider != null)
                 {
-                    groundNormal += foundHits[i].normal;
+                    groundNormal += groundFoundHits[i].normal;
                     hitCount++;
                 }
             }
@@ -185,6 +328,11 @@ public class CharacterController2D : MonoBehaviour {
             {
                 groundNormal.Normalize();
             }
+
+            if (hitCount < 3 && hitCount > 0)
+                ReachedEdge = true;
+            else
+                ReachedEdge = false;
 
             Vector2 relativeVelocity = _rigidbody.velocity;
             
@@ -217,16 +365,16 @@ public class CharacterController2D : MonoBehaviour {
                     if (groundColliders[1] != null)
                     {
                         float colliderBottomHeight = _rigidbody.position.y + _collider.offset.y - _collider.size.y * 0.5f;
-                        float middleHitHeight = foundHits[1].point.y;
+                        float middleHitHeight = groundFoundHits[1].point.y;
                         Grounded &= (middleHitHeight < colliderBottomHeight + groundedRaycastDistance);
                     }
                 }
             }
         }
 
-        for (int i = 0; i < hitResults.Length; i++)
+        for (int i = 0; i < groundHitResults.Length; i++)
         {
-            hitResults[i] = new RaycastHit2D();
+            groundHitResults[i] = new RaycastHit2D();
         }
     }
 }

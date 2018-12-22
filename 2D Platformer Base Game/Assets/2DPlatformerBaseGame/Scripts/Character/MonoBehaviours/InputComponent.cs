@@ -24,6 +24,8 @@ public abstract class InputComponent : MonoBehaviour
         Menu,
         LeftBumper,
         RightBumper,
+        LeftTrigger,
+        // RightTrigger,
     }
 
     public enum XboxControllerAxes
@@ -70,6 +72,7 @@ public abstract class InputComponent : MonoBehaviour
                 {(int)XboxControllerButtons.Menu, "Menu"},
                 {(int)XboxControllerButtons.LeftBumper, "Left Bumper"},
                 {(int)XboxControllerButtons.RightBumper, "Right Bumper"},
+                // {(int)XboxControllerButtons.RightTrigger, "Right Trigger" },
             };
 
         public InputButton(KeyCode key, XboxControllerButtons controllerButton)

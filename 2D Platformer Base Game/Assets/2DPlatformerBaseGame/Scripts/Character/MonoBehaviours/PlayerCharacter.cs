@@ -9,14 +9,12 @@ using UnityEngine.Tilemaps;
 
 public class PlayerCharacter : MonoBehaviour {
 
-    static protected PlayerCharacter playerInstance;
-    static public PlayerCharacter PlayerInstance
-    { get { return playerInstance; } }
+    #region VARIABLES
 
-    public InventoryController InventoryController
-    {
-        get { return inventoryController; }
-    }
+    static protected PlayerCharacter playerInstance;
+    static public PlayerCharacter PlayerInstance { get { return playerInstance; } }
+
+    public InventoryController InventoryController { get { return inventoryController; } }
     
     public SpriteRenderer spriteRenderer;
     public Damageable damageable;
@@ -25,6 +23,7 @@ public class PlayerCharacter : MonoBehaviour {
     public Transform facingRightBulletSpawnPoint;
     public BulletPool bulletPool;
     public Transform cameraFollowTarget;
+    public BoyController boy;
 
     public float maxSpeed = 10f;
     public float groundAcceleration = 100f;
@@ -36,8 +35,12 @@ public class PlayerCharacter : MonoBehaviour {
     public float jumpSpeed = 20f;
     public float jumpAbortSpeedReduction = 100f;
 
-    public float wallSlideVertSpeedReduction = 0f;
-    public float wallSlideJumpAngle = 45f;
+    public float wallSlideUpGravity = 70f;
+    public float wallSlideDownGravity = 5f;
+    public float wallSlideJumpX = 20f;
+    public float wallSlideJumpY = 20f;
+    public float wallSlideTimeoutDuration = 3f;
+    public float wallSlideCooldownDuration = 3f;
     public bool canWallSlideUp = false;
     public float wallSlideUpSpeed = 0f;
 
@@ -66,11 +69,12 @@ public class PlayerCharacter : MonoBehaviour {
     public float maxVerticalDeltaDampTime = 0.6f;
     public float verticalCameraOffsetDelay = 1f;
 
+    public string triggerTag;
     public bool spriteOriginallyFacesLeft;
 
     protected CharacterController2D characterController2D;
     protected Animator animator;
-    protected BoxCollider2D _collider;
+    protected new CapsuleCollider2D collider;
     protected Vector2 moveVector;
     protected List<Pushable> currentPushables = new List<Pushable>(4);
     protected Pushable currentPushable;
@@ -85,15 +89,22 @@ public class PlayerCharacter : MonoBehaviour {
     protected bool isFiring;
     protected float shotTimer;
     protected float rangedAttackTimeRemaining;
+    protected float wallSlideTimeRemaining;
+    protected float wallSlideCooldownTimeRemaining;
+    protected bool canSlide = true;
+    protected bool slideCooldown = false;
     protected TileBase currentSurface;
     protected float camFollowHorizontalSpeed;
     protected float camFollowVerticalSpeed;
     protected float verticalCameraOffsetTimer;
     protected InventoryController inventoryController;
+    protected bool hasBoy = true;
 
     protected Checkpoint lastCheckpoint = null;
     protected Vector2 startingPosition = Vector2.zero;
     protected bool startingFacingLeft = false;
+    protected List<Vector2> jumpLocations = new List<Vector2>();
+    protected List<Vector2> landLocations = new List<Vector2>();
 
     protected bool inPause = false;
 
@@ -115,14 +126,26 @@ public class PlayerCharacter : MonoBehaviour {
     protected const float maxHurtJumpAngle = 89.999f;
     protected const float groundStickVelocityMultiplier = 3f;
 
+    [HideInInspector]
+    public Shield shield;
+    [HideInInspector]
+    public int swordDurability = 0;
+    [HideInInspector]
+    public int gunAmmo = 0;
+    [HideInInspector]
+    public bool canBoost;
+
+    #endregion
+
     void Awake()
     {
         playerInstance = this;
         characterController2D = GetComponent<CharacterController2D>();
         animator = GetComponent<Animator>();
-        _collider = GetComponent<BoxCollider2D>();
-        // _collider = GetComponent<CapsuleCollider2D>();
+        collider = GetComponent<CapsuleCollider2D>();
+        shield = GetComponent<Shield>();
         inventoryController = GetComponent<InventoryController>();
+        damageable = GetComponent<Damageable>();
 
         currentBulletSpawnPoint = spriteOriginallyFacesLeft ? facingLeftBulletSpawnPoint : facingRightBulletSpawnPoint;
     }
@@ -155,25 +178,14 @@ public class PlayerCharacter : MonoBehaviour {
 
         startingPosition = transform.position;
         startingFacingLeft = (GetFacing() < 0.0f);
-    }
 
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        Pushable pushable = other.GetComponent<Pushable>();
-        if (pushable != null)
-        {
-            currentPushables.Add(pushable);
-        }
-    }
+        wallSlideCooldownTimeRemaining = wallSlideCooldownDuration;
+        wallSlideTimeRemaining = wallSlideTimeoutDuration;
 
-    private void OnTriggerExit2D(Collider2D other)
-    {
-        Pushable pushable = other.GetComponent<Pushable>();
-        if (pushable != null)
-        {
-            if (currentPushables.Contains(pushable))
-                currentPushables.Remove(pushable);
-        }
+        DisableWallSlide();
+        //DisableShield();
+        // LoseSword();
+        // DisableRangedAttack();
     }
 
     void Update()
@@ -207,8 +219,31 @@ public class PlayerCharacter : MonoBehaviour {
         UpdateCameraFollowTargetPosition();
     }
 
+    #region TRIGGERS
 
-    // PAUSE
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Pushable pushable = other.GetComponent<Pushable>();
+        if (pushable != null)
+        {
+            currentPushables.Add(pushable);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        Pushable pushable = other.GetComponent<Pushable>();
+        if (pushable != null)
+        {
+            if (currentPushables.Contains(pushable))
+                currentPushables.Remove(pushable);
+
+        }
+    }
+
+    #endregion
+
+    #region PAUSE
 
     public void Unpause()
     {
@@ -228,8 +263,9 @@ public class PlayerCharacter : MonoBehaviour {
         inPause = false;
     }
 
+    #endregion
 
-    // CAMERA FOLLOW
+    #region CAMERA FOLLOW
 
     protected void UpdateCameraFollowTargetPosition()
     {
@@ -278,8 +314,53 @@ public class PlayerCharacter : MonoBehaviour {
         cameraFollowTarget.localPosition = new Vector2(newLocalPosX, newLocalPosY);
     }
 
+    #endregion
 
-    // MOVEMENT
+    #region BOY FOLLOW
+
+    public void GainBoy()
+    {
+        hasBoy = true;
+    }
+
+    public void LoseBoy()
+    {
+        hasBoy = false;
+    }
+
+    public void AddJumpLocation()
+    {
+        jumpLocations.Add(transform.position);
+        EventManager.TriggerEvent("AddedJumpLoc");
+    }
+
+    public void AddLandLocation()
+    {
+        landLocations.Add(transform.position);
+        EventManager.TriggerEvent("AddedLandLoc");
+    }
+
+    public Vector3 GetJumpLocation()
+    {
+        Vector2 temp = jumpLocations[0];
+        jumpLocations.RemoveAt(0);
+        if (jumpLocations.Count == 0)
+            EventManager.TriggerEvent("EmptyJumpLoc");
+        return temp;
+    }
+
+    public Vector2 GetLandLocation()
+    {
+        Vector2 temp = landLocations[0];
+        landLocations.RemoveAt(0);
+        if (landLocations.Count == 0)
+            EventManager.TriggerEvent("EmptyLandLoc");
+        return temp;
+    }
+
+    #endregion
+
+    #region MOVEMENT
 
     public void SetMoveVector(Vector2 newMoveVector)
     {
@@ -293,6 +374,7 @@ public class PlayerCharacter : MonoBehaviour {
 
     public void SetVerticalMovement(float newVerticalMovement)
     {
+        rangedAttackAudioPlayer.PlayRandomSound();
         moveVector.y = newVerticalMovement;
     }
 
@@ -314,6 +396,128 @@ public class PlayerCharacter : MonoBehaviour {
     public Vector2 GetMoveVector()
     {
         return moveVector;
+    }
+
+    public void GroundHorizontalMovement(bool useInput, float speedScale = 1f)
+    {
+        float desiredSpeed = useInput ? PlayerInput.Instance.Horizontal.Value * maxSpeed * speedScale : 0f;
+        float acceleration = useInput && PlayerInput.Instance.Horizontal.ReceivingInput ? groundAcceleration : groundDeceleration;
+        if (moveVector.x != 0)
+            PlayFootstep();
+        moveVector.x = Mathf.MoveTowards(moveVector.x, desiredSpeed, acceleration * Time.deltaTime);
+    }
+
+    public void GroundVerticalMovement()
+    {
+        moveVector.y -= gravity * Time.deltaTime;
+
+        if (moveVector.y < -gravity * Time.deltaTime * groundStickVelocityMultiplier)
+        {
+            moveVector.y = -gravity * Time.deltaTime * groundStickVelocityMultiplier;
+        }
+    }
+
+    public bool CheckGrounded()
+    {
+        bool wasGrounded = animator.GetBool(hashGroundedParameter);
+        bool grounded = characterController2D.Grounded;
+        
+        if (grounded)
+        {
+            //FindCurrentSurface();
+
+            if (!wasGrounded && moveVector.y < -1.0f)
+            {
+                landingAudioPlayer.PlayRandomSound();
+                //landingAudioPlayer.PlayRandomSound(currentSurface);
+            }
+        }
+        else
+        {
+            currentSurface = null;
+        }
+
+        animator.SetBool(hashGroundedParameter, grounded);
+
+        return grounded;
+    }
+
+    public void FindCurrentSurface()
+    {
+        Collider2D groundCollider = characterController2D.GroundColliders[0];
+
+        if (groundCollider == null)
+        {
+            groundCollider = characterController2D.GroundColliders[1];
+        }
+
+        if (groundCollider == null)
+        {
+            return;
+        }
+
+        TileBase b = PhysicsHelper.FindTileForOverride(groundCollider, transform.position, Vector2.down);
+        if (b != null)
+        {
+            currentSurface = b;
+        }
+    }
+
+    public void AirHorizontalMovement()
+    {
+        float desiredSpeed = PlayerInput.Instance.Horizontal.Value * maxSpeed;
+        float acceleration;
+
+        if (PlayerInput.Instance.Horizontal.ReceivingInput)
+        {
+            acceleration = groundAcceleration * airborneAccelProportion;
+        }
+        else
+        {
+            acceleration = groundDeceleration * airborneDecelProportion;
+        }
+
+        moveVector.x = Mathf.MoveTowards(moveVector.x, desiredSpeed, acceleration * Time.deltaTime);
+    }
+
+    public void AirVerticalMovement()
+    {
+        if (Mathf.Approximately(moveVector.y, 0f) || characterController2D.OnCeiling && moveVector.y > 0f)
+        {
+            moveVector.y = 0f;
+        }
+        moveVector.y -= gravity * Time.deltaTime;
+    }
+
+    public bool IsFalling()
+    {
+        return moveVector.y < 0f && !animator.GetBool(hashGroundedParameter);
+    }
+
+    public void PlayFootstep()
+    {
+        footstepAudioPlayer.PlayRandomSound();
+        //var footstepPosition = transform.position;
+        //footstepPosition.z -= 1;
+        //VFXController.Instance.Trigger("DustPuff", footstepPosition, 0, false, null, currentSurface);
+    }
+
+    #endregion
+
+    #region FACING
+
+    public void ForceFacing(bool faceLeft)
+    {
+        if (faceLeft)
+        {
+            spriteRenderer.flipX = !spriteOriginallyFacesLeft;
+            currentBulletSpawnPoint = facingLeftBulletSpawnPoint;
+        }
+        else
+        {
+            spriteRenderer.flipX = spriteOriginallyFacesLeft;
+            currentBulletSpawnPoint = facingRightBulletSpawnPoint;
+        }
     }
 
     public void UpdateFacing()
@@ -352,69 +556,9 @@ public class PlayerCharacter : MonoBehaviour {
         return spriteRenderer.flipX != spriteOriginallyFacesLeft ? -1f : 1f;
     }
 
-    public void GroundHorizontalMovement(bool useInput, float speedScale = 1f)
-    {
-        float desiredSpeed = useInput ? PlayerInput.Instance.Horizontal.Value * maxSpeed * speedScale : 0f;
-        float acceleration = useInput && PlayerInput.Instance.Horizontal.ReceivingInput ? groundAcceleration : groundDeceleration;
-        moveVector.x = Mathf.MoveTowards(moveVector.x, desiredSpeed, acceleration * Time.deltaTime);
-    }
+#endregion
 
-    public void GroundVerticalMovement()
-    {
-        moveVector.y -= gravity * Time.deltaTime;
-
-        if (moveVector.y < -gravity * Time.deltaTime * groundStickVelocityMultiplier)
-        {
-            moveVector.y = -gravity * Time.deltaTime * groundStickVelocityMultiplier;
-        }
-    }
-
-    public bool CheckGrounded()
-    {
-        bool wasGrounded = animator.GetBool(hashGroundedParameter);
-        bool grounded = characterController2D.Grounded;
-
-        /*
-        if (grounded)
-        {
-            FindCurrentSurface();
-
-            if (!wasGrounded && moveVector.y < -1.0f)
-            {
-                landingAudioPlayer.PlayRandomSound(currentSurface);
-            }
-        }
-        else
-        {
-            currentSurface = null;
-        }
-        */
-
-        animator.SetBool(hashGroundedParameter, grounded);
-
-        return grounded;
-    }
-
-    public void FindCurrentSurface()
-    {
-        Collider2D groundCollider = characterController2D.GroundColliders[0];
-
-        if (groundCollider == null)
-        {
-            groundCollider = characterController2D.GroundColliders[1];
-        }
-
-        if (groundCollider == null)
-        {
-            return;
-        }
-
-        TileBase b = PhysicsHelper.FindTileForOverride(groundCollider, transform.position, Vector2.down);
-        if (b != null)
-        {
-            currentSurface = b;
-        }
-    }
+    #region PUSHING
 
     public void CheckForPushing()
     {
@@ -449,9 +593,7 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         if (previousPushable != null && currentPushable != previousPushable)
-        {
             previousPushable.EndPushing();
-        }
 
         animator.SetBool(hashPushingPara, pushableOnCorrectSide);
     }
@@ -459,60 +601,50 @@ public class PlayerCharacter : MonoBehaviour {
     public void MovePushable()
     {
         if (currentPushable && currentPushable.Grounded)
-        {
             currentPushable.Move(moveVector * Time.deltaTime);
-        }
     }
 
     public void StartPushing()
     {
         if (currentPushable)
-        {
             currentPushable.StartPushing();
-        }
     }
 
     public void StopPushing()
     {
         if (currentPushable)
-        {
             currentPushable.EndPushing();
-        }
     }
 
-    public void AirHorizontalMovement()
-    {
-        float desiredSpeed = PlayerInput.Instance.Horizontal.Value * maxSpeed;
-        float acceleration;
+#endregion
 
-        if (PlayerInput.Instance.Horizontal.ReceivingInput)
+    #region SHIELD
+
+    public bool CheckForBoostInput()
+    {
+        if (canBoost)
         {
-            acceleration = groundAcceleration * airborneAccelProportion;
+            return Input.GetKeyUp(KeyCode.Mouse0);
         }
         else
-        {
-            acceleration = groundDeceleration * airborneDecelProportion;
-        }
-
-        moveVector.x = Mathf.MoveTowards(moveVector.x, desiredSpeed, acceleration * Time.deltaTime);
+            return false;
     }
 
-    public void AirVerticalMovement()
+    public void DisableShield()
     {
-        if (Mathf.Approximately(moveVector.y, 0f) || characterController2D.OnCeiling && moveVector.y > 0f)
-        {
-            moveVector.y = 0f;
-        }
-        moveVector.y -= gravity * Time.deltaTime;
+        canBoost = false;
+        shield.shieldPivot.gameObject.SetActive(false);
     }
 
-    public bool IsFalling()
+    public void EnableShield()
     {
-        return moveVector.y < 0f && !animator.GetBool(hashGroundedParameter);
+        canBoost = true;
+        shield.shieldPivot.gameObject.SetActive(true);
     }
 
+    #endregion
 
-    // JUMP
+    #region JUMP
 
     public bool CheckForJumpInput()
     {
@@ -532,20 +664,110 @@ public class PlayerCharacter : MonoBehaviour {
         }
     }
 
+    #endregion
 
-    // WALL SLIDE
+    #region WALLSLIDE
 
-    public bool CheckForWallSlideInput()
+    public void WallSlideUpVerticalMovement()
     {
-        return (GetFacing() == -1 && PlayerInput.Instance.Horizontal.Value < 0 || GetFacing() == 1 && PlayerInput.Instance.Horizontal.Value > 0);
-    }
-    public void WallSlide()
-    {
-        animator.SetBool(hashWallSlideParameter, true);
+        moveVector.y -= wallSlideUpGravity * Time.deltaTime;
     }
 
+    public void WallSlideDownVerticalMovement()
+    {
+        moveVector.y = 0f;
+        Debug.Log("Y velocity " + characterController2D.Velocity);
+        moveVector.y -= (wallSlideDownGravity * Time.deltaTime);
+        Debug.Log(wallSlideDownGravity * Time.deltaTime);
+    }
 
-    // MELEE ATTACK
+    public bool TouchingWall()
+    {
+        return characterController2D.TouchingWall;
+    }
+
+    public void CheckWallSlide()
+    {
+        if (canSlide)
+        {
+            if (characterController2D.TouchingWall)
+            {
+                animator.SetBool(hashWallSlideParameter, true);
+            }
+            else
+            {
+                animator.SetBool(hashWallSlideParameter, false);
+            }
+        }
+        
+        /*
+        bool isSliding = false;
+
+        if (characterController2D.TouchingWall && canSlide)
+        {
+            //Debug.Log("Is sliding");
+            isSliding = true;
+            animator.SetBool(hashWallSlideParameter, true);
+            wallSlideCooldownTimeRemaining = wallSlideCooldownDuration;
+        }
+        else
+        {
+           // Debug.Log("Not sliding");
+            isSliding = false;
+            animator.SetBool(hashWallSlideParameter, false);
+            wallSlideTimeRemaining = wallSlideTimeoutDuration;
+        }
+
+        while (isSliding)
+        {
+            //Debug.Log("While isSliding");
+            wallSlideTimeRemaining -= Time.deltaTime;
+            //Debug.Log("Slide time remaining: " + wallSlideTimeRemaining);
+            if (wallSlideTimeRemaining <= 0f)
+            {
+                //Debug.Log("Wall slide time expired");
+                isSliding = false;
+                canSlide = false;
+                slideCooldown = true;
+                wallSlideTimeRemaining = wallSlideTimeoutDuration;
+                animator.SetBool(hashWallSlideParameter, false);
+            }
+        }
+
+        while (slideCooldown)
+        {
+            //Debug.Log("Slide Cooldown activated");
+            wallSlideCooldownTimeRemaining -= Time.deltaTime;
+            //Debug.Log("Cooldown time remaining: " + wallSlideCooldownTimeRemaining);
+            if (wallSlideCooldownTimeRemaining <= 0f)
+            {
+                //Debug.Log("Cooldown expired");
+                canSlide = true;
+                slideCooldown = false;
+                wallSlideCooldownTimeRemaining = wallSlideCooldownDuration;
+            }
+        }
+        */
+    }
+
+    public void ForceNotWallSlide()
+    {
+        animator.SetBool(hashWallSlideParameter, false);
+    }
+
+    public void EnableWallSlide()
+    {
+        canSlide = true;
+    }
+
+    public void DisableWallSlide()
+    {
+        canSlide = false;
+    }
+
+    #endregion
+
+    #region MELEE ATTACK
 
     public bool CheckForMeleeAttackInput()
     {
@@ -568,14 +790,30 @@ public class PlayerCharacter : MonoBehaviour {
         meleeDamager.DisableDamage();
     }
 
+    public void GainSword()
+    {
+        PlayerInput.Instance.EnableMeleeAttacking();
+    }
+
+    public void LoseSword()
+    {
+        PlayerInput.Instance.DisableMeleeAttacking();
+    }
+
     public void TeleportToColliderBottom()
     {
-        Vector2 colliderBottom = characterController2D.Rigidbody.position + _collider.offset + Vector2.down * _collider.size.y * 0.5f;
+        Vector2 colliderBottom = characterController2D.Rigidbody.position + collider.offset + Vector2.down * collider.size.y * 0.5f;
         characterController2D.Teleport(colliderBottom);
     }
 
+    #endregion
 
-    // RANGED ATTACK
+    #region RANGED ATTACK
+
+    public void SetBulletCount(int count)
+    {
+        bulletPool.initialPoolCount = count;
+    }
 
     protected void UpdateBulletSpawnPointPositions()
     {
@@ -615,7 +853,7 @@ public class PlayerCharacter : MonoBehaviour {
         direction.Normalize();
 
         RaycastHit2D[] results = new RaycastHit2D[12];
-        if (Physics2D.Raycast(testPosition, direction, characterController2D.ContactFilter, results, distance) > 0)
+        if (Physics2D.Raycast(testPosition, direction, characterController2D.GroundContactFilter, results, distance) > 0)
         {
             return;
         }
@@ -624,6 +862,8 @@ public class PlayerCharacter : MonoBehaviour {
         bool facingLeft = currentBulletSpawnPoint == facingLeftBulletSpawnPoint;
         bullet.rigidbody2D.velocity = new Vector2(facingLeft ? -bulletSpeed : bulletSpeed, 0f);
         bullet.spriteRenderer.flipX = facingLeft ^ bullet.bullet.spriteOriginallyFacesLeft;
+
+        rangedAttackAudioPlayer.PlayRandomSound();
     }
 
     public bool CheckForRangedAttackOut()
@@ -671,7 +911,19 @@ public class PlayerCharacter : MonoBehaviour {
         animator.SetBool(hashRangedAttackParameter, false);
     }
 
-    // INVULNERABILITY
+    public void EnableRangedAttack()
+    {
+        PlayerInput.Instance.EnableRangedAttacking();
+    }
+
+    public void DisableRangedAttack()
+    {
+        PlayerInput.Instance.DisableRangedAttacking();
+    }
+
+    #endregion
+
+    #region INVULNERABILITY
 
     public void EnableInvulnerability()
     {
@@ -683,8 +935,9 @@ public class PlayerCharacter : MonoBehaviour {
         damageable.DisableInvulnerability();
     }
 
+    #endregion
 
-    // FLICKER
+    #region FLICKER
 
     protected IEnumerator Flicker()
     {
@@ -711,8 +964,9 @@ public class PlayerCharacter : MonoBehaviour {
         spriteRenderer.enabled = true;
     }
 
+    #endregion
 
-    // TAKE DAMAGE
+    #region TAKE DAMAGE
 
     public Vector2 GetHurtDirection()
     {
@@ -746,27 +1000,34 @@ public class PlayerCharacter : MonoBehaviour {
         }
 
         animator.SetBool(hashGroundedParameter, false);
+        hurtAudioPlayer.PlayRandomSound();
 
         if (damager.forceRespawn && damageable.CurrentHealth > 0)
         {
-            StartCoroutine(DieRespawnCoroutine(false, true));
+            StartCoroutine(DieRespawnCoroutine(false, true, 1.0f));
         }
     }
 
+    #endregion
 
-    // DIE
+    #region DIE
 
     public void OnDie()
     {
         animator.SetTrigger(hashDeadParameter);
 
-        StartCoroutine(DieRespawnCoroutine(true, false));
+        StartCoroutine(DieRespawnCoroutine(true, false, 1.0f));
     }
 
-    IEnumerator DieRespawnCoroutine(bool resetHealth, bool useCheckPoint)
+    public void TriggerDieRespawn(bool resetHealth, bool useCheckPoint, float waitTime)
+    {
+        StartCoroutine(DieRespawnCoroutine(resetHealth, useCheckPoint, waitTime));
+    }
+
+    IEnumerator DieRespawnCoroutine(bool resetHealth, bool useCheckPoint, float waitTime)
     {
         PlayerInput.Instance.ReleaseControl(true);
-        yield return new WaitForSeconds(1.0f);
+        yield return new WaitForSeconds(waitTime);
         yield return StartCoroutine(ScreenFader.FadeSceneOut(useCheckPoint ? ScreenFader.FadeType.Black : ScreenFader.FadeType.GameOver));
         if (!useCheckPoint)
         {
@@ -778,8 +1039,9 @@ public class PlayerCharacter : MonoBehaviour {
         PlayerInput.Instance.GainControl();
     }
 
+    #endregion
 
-    // RESPAWN
+    #region RESPAWN
 
     public void Respawn(bool resetHealth, bool useCheckpoint)
     {
@@ -787,7 +1049,6 @@ public class PlayerCharacter : MonoBehaviour {
         {
             damageable.SetHealth(damageable.startingHealth);
         }
-
         
         animator.ResetTrigger(hashHurtParameter);
         if (flickerCoroutine != null)
@@ -795,17 +1056,21 @@ public class PlayerCharacter : MonoBehaviour {
             StopFlickering();
         }
         animator.SetTrigger(hashRespawnParameter);
-        
 
         if (useCheckpoint && lastCheckpoint != null)
         {
             UpdateFacing(lastCheckpoint.respawnFacingLeft);
             GameObjectTeleporter.Teleport(gameObject, lastCheckpoint.transform.position);
+            CheckGrounded();
+            boy.Respawn(lastCheckpoint.transform.position);
         }
         else
         {
             UpdateFacing(startingFacingLeft);
             GameObjectTeleporter.Teleport(gameObject, startingPosition);
+            CheckGrounded();
+            animator.SetBool(hashGroundedParameter, true);
+            boy.Respawn(startingPosition);
         }
     }
 
@@ -814,10 +1079,5 @@ public class PlayerCharacter : MonoBehaviour {
         lastCheckpoint = checkpoint;
     }
 
-    /*
-    public void KeyInventoryEvent()
-    {
-        if (KeyUI.Instance != null) KeyUI.Instance.ChangeKeyUI(inventoryController);
-    }
-    */
+    #endregion
 }
